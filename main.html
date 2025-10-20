@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+ <html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資産管理アプリ | Asset Tracker</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Google Fonts: Inter & Noto Sans JP/SC -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: 'Inter', 'Noto Sans JP', 'Noto Sans SC', sans-serif;
+    } 
+    /* Custom scrollbar styles */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+    .modal-backdrop { background-color: rgba(0,0,0,0.5); }
+    .lang-btn-active {
+        background-color: #4f46e5; /* indigo-600 */
+        color: white;
+        border-color: #4f46e5; 
+    }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800" data-lang-key="appTitle">資産管理アプリ</h1>
+                <p class="text-gray-600 mt-2" data-lang-key="appSubtitle">あなたのお金の流れをシンプルに可視化します。</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button id="lang-ja" class="px-3 py-1 text-sm rounded-md border transition-colors duration-200">日本語</button>
+                <button id="lang-zh" class="px-3 py-1 text-sm rounded-md border transition-colors duration-200">中文</button>
+            </div>
+        </header>
+        
+        <!-- Privacy Notice -->
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-lg" role="alert">
+            <p class="font-bold" data-lang-key="privacyTitle">プライバシーについて</p>
+            <p data-lang-key="privacyBody">入力されたすべてのデータは、お使いのブラウザのローカルストレージにのみ保存されます。サーバーに送信されたり、第三者と共有されることはありません。</p>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-lg font-semibold text-gray-500" data-lang-key="totalAssets">総資産</h3>
+                <p id="total-assets" class="text-3xl font-bold text-gray-800 mt-2">¥0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-lg font-semibold text-gray-500" data-lang-key="totalIncome">累計収入</h3>
+                <p id="total-income" class="text-3xl font-bold text-green-600 mt-2">¥0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-lg font-semibold text-gray-500" data-lang-key="totalExpense">累計支出</h3>
+                <p id="total-expense" class="text-3xl font-bold text-red-600 mt-2">¥0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">
+                <h3 class="text-lg font-semibold text-gray-500" data-lang-key="netWorth">純資産</h3>
+                <p id="net-worth" class="text-3xl font-bold text-blue-600 mt-2">¥0</p>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Input Form -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-md">
+                <h2 class="text-2xl font-bold mb-6" data-lang-key="dataEntry">データ入力</h2>
+                <form id="entry-form" class="space-y-6">
+                    <div>
+                        <label for="entry-type" class="block text-sm font-medium text-gray-700" data-lang-key="entryType">種類</label>
+                        <select id="entry-type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm">
+                            <option value="income" data-lang-key="typeIncome">収入</option>
+                            <option value="expense" data-lang-key="typeExpense">支出</option>
+                            <option value="deposit" data-lang-key="typeDeposit">預金残高</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-700" data-lang-key="date">日付</label>
+                        <input type="date" id="date" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                        <p class="mt-1 text-xs text-gray-500" data-lang-key="dateHelp">カレンダーアイコンから過去の日付も選択できます。</p>
+                    </div>
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700" data-lang-key="amount">金額</label>
+                        <input type="number" id="amount" data-lang-placeholder-key="amountPlaceholder" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                    </div>
+                    <div>
+                        <label for="memo" class="block text-sm font-medium text-gray-700" data-lang-key="memoLabel">メモ (任意)</label>
+                        <textarea id="memo" rows="3" data-lang-placeholder-key="memoPlaceholder" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                    <div id="account-selector-wrapper">
+                        <label for="account-selector" class="block text-sm font-medium text-gray-700" data-lang-key="account">口座</label>
+                        <select id="account-selector" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition" data-lang-key="recordButton">記録する</button>
+                </form>
+                <div class="mt-6 space-y-3">
+                    <button id="open-settings-modal" class="w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition" data-lang-key="settingsButton">銀行口座の設定</button>
+                    <button id="open-interest-modal" class="w-full bg-teal-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-teal-700 transition" data-lang-key="interestButton">利率計算ツール</button>
+                    <button id="open-exchange-modal" class="w-full bg-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-700 transition" data-lang-key="exchangeButton">為替レート記録</button>
+                </div>
+            </div>
+            
+            <!-- Right: Chart & History -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4" data-lang-key="assetChartTitle">資産推移グラフ</h2>
+                    <canvas id="asset-chart"></canvas>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-4" data-lang-key="historyTitle">全履歴</h2>
+                    <div class="max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyDate">日付</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyType">種類</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyAmount">金額</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyAccount">口座</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyMemo">メモ</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider" data-lang-key="historyAction">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 modal-backdrop"></div>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md m-4 p-8 z-10">
+            <h2 class="text-2xl font-bold mb-6" data-lang-key="settingsTitle">銀行口座の設定</h2>
+            <form id="settings-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700" data-lang-key="account1">口座 1</label>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <input type="text" id="account-name-1" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm">
+                        <input type="color" id="account-color-1" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700" data-lang-key="account2">口座 2</label>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <input type="text" id="account-name-2" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm">
+                        <input type="color" id="account-color-2" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700" data-lang-key="account3">口座 3</label>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <input type="text" id="account-name-3" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm">
+                        <input type="color" id="account-color-3" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" id="close-settings-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button>
+                    <button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition" data-lang-key="saveButton">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="interest-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 modal-backdrop"></div>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md m-4 p-8 z-10">
+            <h2 class="text-2xl font-bold mb-6" data-lang-key="interestTitle">利率計算ツール (年利)</h2>
+            <form id="interest-form" class="space-y-4">
+                <div>
+                    <label for="start-balance" class="block text-sm font-medium text-gray-700" data-lang-key="startBalance">期間開始時の残高</label>
+                    <input type="number" id="start-balance" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="end-balance" class="block text-sm font-medium text-gray-700" data-lang-key="endBalance">期間終了時の残高</label>
+                    <input type="number" id="end-balance" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="net-deposit" class="block text-sm font-medium text-gray-700" data-lang-key="netDeposit">期間中の入金額 (利子を除く)</label>
+                    <input type="number" id="net-deposit" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label for="period" class="block text-sm font-medium text-gray-700" data-lang-key="periodMonths">期間(ヶ月)</label>
+                    <input type="number" id="period" value="12" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <button type="submit" class="w-full bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition" data-lang-key="calculateButton">計算</button>
+            </form>
+            <div id="interest-result" class="mt-6 text-center bg-gray-100 p-4 rounded-lg hidden">
+                <p class="text-lg font-semibold" data-lang-key="interestResultTitle">計算された年利:</p>
+                <p id="interest-rate-result" class="text-3xl font-bold text-teal-700"></p>
+            </div>
+            <div class="text-right mt-6">
+                <button type="button" id="close-interest-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Exchange Rate Modal (New) -->
+    <div id="exchange-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 modal-backdrop"></div>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl m-4 p-8 z-10">
+            <h2 class="text-2xl font-bold mb-6" data-lang-key="exchangeTitle">為替レート記録 (JPY ⇄ CNY)</h2>
+            <!-- Input Form -->
+            <form id="exchange-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end mb-6">
+                <div>
+                    <label for="exchange-date" class="block text-sm font-medium text-gray-700" data-lang-key="date">日付</label>
+                    <input type="date" id="exchange-date" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                </div>
+                <div>
+                    <label for="exchange-jpy" class="block text-sm font-medium text-gray-700" data-lang-key="jpyAmount">支払った日本円 (JPY)</label>
+                    <input type="number" id="exchange-jpy" placeholder="10000" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                </div>
+                <div>
+                    <label for="exchange-cny" class="block text-sm font-medium text-gray-700" data-lang-key="cnyAmount">受け取った中国元 (CNY)</label>
+                    <input type="number" id="exchange-cny" placeholder="500" step="0.01" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="md:col-span-3">
+                    <button type="submit" class="w-full bg-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-700 transition" data-lang-key="recordButton">記録する</button>
+                </div>
+            </form>
+            
+            <!-- History Table -->
+            <h3 class="text-xl font-bold mb-4" data-lang-key="historyTitle">履歴</h3>
+            <div class="max-h-64 overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="historyDate">日付</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="jpyAmount">日本円 (JPY)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="cnyAmount">中国元 (CNY)</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="exchangeRate">レート (1 JPY)</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase" data-lang-key="historyAction">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exchange-history-body" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+            <div class="text-right mt-6">
+                <button type="button" id="close-exchange-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button>
+            </div>
+        </div>
+    </div>
+    
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Translation Dictionary ---
+    const translations = {
+        ja: {
+            appTitle: "資産管理アプリ", appSubtitle: "あなたのお金の流れをシンプルに可視化します。", privacyTitle: "プライバシーについて", privacyBody: "入力されたすべてのデータは、お使いのブラウザのローカルストレージにのみ保存されます。サーバーに送信されたり、第三者と共有されることはありません。", totalAssets: "総資産", totalIncome: "累計収入", totalExpense: "累計支出", netWorth: "純資産", dataEntry: "データ入力", entryType: "種類", typeIncome: "収入", typeExpense: "支出", typeDeposit: "預金残高", date: "日付", dateHelp: "カレンダーアイコンから過去の日付も選択できます。", amount: "金額", amountPlaceholder: "例: 300000", memoLabel: "メモ (任意)", memoPlaceholder: "例: 中国渡航のため", account: "口座", recordButton: "記録する", settingsButton: "銀行口座の設定", interestButton: "利率計算ツール", exchangeButton: "為替レート記録", assetChartTitle: "資産推移グラフ", historyTitle: "全履歴", historyDate: "日付", historyType: "種類", historyAmount: "金額", historyAccount: "口座", historyMemo: "メモ", historyAction: "操作", historyEmpty: "履歴がありません。", historyDelete: "削除", settingsTitle: "銀行口座の設定", account1: "口座 1", account2: "口座 2", account3: "口座 3", bankNamePlaceholder: "銀行名", closeButton: "閉じる", saveButton: "保存", interestTitle: "利率計算ツール (年利)", startBalance: "期間開始時の残高", endBalance: "期間終了時の残高", netDeposit: "期間中の入金額 (利子を除く)", periodMonths: "期間(ヶ月)", calculateButton: "計算", interestResultTitle: "計算された年利:", confirmDelete: "この履歴を削除しますか？", chartIncome: "月間収入", chartExpense: "月間支出", chartBalance: "残高", exchangeTitle: "為替レート記録 (JPY ⇄ CNY)", jpyAmount: "日本円 (JPY)", cnyAmount: "中国元 (CNY)", exchangeRate: "レート (1 JPY)", exchangeHistoryEmpty: "両替履歴がありません。"
+        },
+        zh: {
+            appTitle: "资产管理应用", appSubtitle: "简单地可视化您的资金流向。", privacyTitle: "关于隐私", privacyBody: "您输入的所有数据仅保存在您浏览器的本地存储中。它不会被发送到服务器或与任何第三方共享。", totalAssets: "总资产", totalIncome: "累计收入", totalExpense: "累计支出", netWorth: "净资产", dataEntry: "数据录入", entryType: "类型", typeIncome: "收入", typeExpense: "支出", typeDeposit: "存款余额", date: "日期", dateHelp: "您可以从日历图标中选择过去的日期。", amount: "金额", amountPlaceholder: "例如: 300000", memoLabel: "备注 (可选)", memoPlaceholder: "例如: 为去中国出差", account: "账户", recordButton: "记录", settingsButton: "银行账户设置", interestButton: "利率计算器", exchangeButton: "汇率记录", assetChartTitle: "资产趋势图", historyTitle: "全部历史记录", historyDate: "日期", historyType: "类型", historyAmount: "金额", historyAccount: "账户", historyMemo: "备注", historyAction: "操作", historyEmpty: "暂无历史记录。", historyDelete: "删除", settingsTitle: "银行账户设置", account1: "账户 1", account2: "账户 2", account3: "账户 3", bankNamePlaceholder: "银行名称", closeButton: "关闭", saveButton: "保存", interestTitle: "利率计算器 (年利率)", startBalance: "期初余额", endBalance: "期末余额", netDeposit: "期间存款金额 (不含利息)", periodMonths: "期间(月)", calculateButton: "计算", interestResultTitle: "计算出的年利率:", confirmDelete: "您确定要删除此条记录吗？", chartIncome: "月收入", chartExpense: "月支出", chartBalance: "余额", exchangeTitle: "汇率记录 (JPY ⇄ CNY)", jpyAmount: "日元 (JPY)", cnyAmount: "人民币 (CNY)", exchangeRate: "汇率 (1 JPY)", exchangeHistoryEmpty: "暂无兑换记录。"
+        }
+    };
+    
+    let currentLang = 'ja';
+    
+    const switchLanguage = (lang) => {
+        if (!translations[lang]) return;
+        currentLang = lang;
+        localStorage.setItem('assetTrackerLang', lang);
+        
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            if (translations[lang][key]) el.textContent = translations[lang][key];
+        });
+        
+        document.querySelectorAll('[data-lang-placeholder-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-placeholder-key');
+            if (translations[lang][key]) el.placeholder = translations[lang][key];
+        });
+        
+        document.getElementById('lang-ja').classList.toggle('lang-btn-active', lang === 'ja');
+        document.getElementById('lang-zh').classList.toggle('lang-btn-active', lang === 'zh'); 
+        
+        updateUI();
+    };
+    
+    // DOM Elements
+    const entryForm = document.getElementById('entry-form');
+    const dateInput = document.getElementById('date');
+    const amountInput = document.getElementById('amount');
+    const memoInput = document.getElementById('memo');
+    const accountSelector = document.getElementById('account-selector');
+    const entryTypeSelect = document.getElementById('entry-type');
+    const accountSelectorWrapper = document.getElementById('account-selector-wrapper');
+    const historyTableBody = document.getElementById('history-table-body');
+    const totalAssetsEl = document.getElementById('total-assets');
+    const totalIncomeEl = document.getElementById('total-income');
+    const totalExpenseEl = document.getElementById('total-expense');
+    const netWorthEl = document.getElementById('net-worth');
+    const settingsModal = document.getElementById('settings-modal');
+    const interestModal = document.getElementById('interest-modal');
+    const exchangeModal = document.getElementById('exchange-modal'); // New
+    const exchangeHistoryBody = document.getElementById('exchange-history-body');// New
+    
+    let assetChart;
+    
+    let data = {
+        accounts: [ { id: 1, name: '銀行A', color: '#4F46E5' }, { id: 2, name: '銀行B', color: '#10B981' }, { id: 3, name: '銀行C', color: '#F59E0B' } ],
+        entries: [],
+        exchanges: [] // New data store for exchanges
+        };
+        
+    function initialize() {
+        const savedLang = localStorage.getItem('assetTrackerLang') || 'ja';
+        loadData();
+        setupEventListeners();
+        setDefaultDate();
+        switchLanguage(savedLang);
+    }
+    
+    function loadData() {
+        const savedData = localStorage.getItem('assetTrackerData');
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            data.accounts = parsedData.accounts || data.accounts; data.entries = parsedData.entries || [];
+            data.exchanges = parsedData.exchanges || []; // Ensure exchanges array exists
+        }
+    }
+        
+    function saveData() {
+        localStorage.setItem('assetTrackerData', JSON.stringify(data));
+    }
+    
+    function setDefaultDate() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        const today = now.toISOString().slice(0,10);
+        dateInput.value = today;
+        document.getElementById('exchange-date').value = today; // Set default for exchange modal too
+    }
+    
+    function updateUI() {
+        updateAccountSelectors();
+        updateDashboard();
+        renderHistory();
+        renderChart();
+        renderExchangeHistory(); // New
+    }
+    
+    function updateAccountSelectors() {
+        accountSelector.innerHTML = '';
+        data.accounts.forEach(acc => {
+            const option = document.createElement('option');
+            option.value = acc.id;
+            option.textContent = acc.name;
+            accountSelector.appendChild(option);
+        });
+
+        data.accounts.forEach(acc => {
+            document.getElementById(`account-name-${acc.id}`).value = acc.name;
+            document.getElementById(`account-color-${acc.id}`).value = acc.color;
+        });
+    }
+    
+    function updateDashboard() {
+        const totalIncome = data.entries.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
+        const totalExpense = data.entries.filter(e => e.type === 'expense').reduce((s, e) => s + e.amount, 0);
+        
+        const totalAssets = data.accounts.reduce((sum, acc) => {
+            const latestDeposit = data.entries.filter(e => e.type === 'deposit' && e.accountId === acc.id).sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+            return sum + (latestDeposit ? latestDeposit.amount : 0);
+        }, 0);
+        
+        totalAssetsEl.textContent = `¥${totalAssets.toLocaleString()}`;
+        totalIncomeEl.textContent = `¥${totalIncome.toLocaleString()}`;
+        totalExpenseEl.textContent = `¥${totalExpense.toLocaleString()}`;
+        netWorthEl.textContent = `¥${(totalIncome - totalExpense).toLocaleString()}`;
+    }
+    
+    function renderHistory() {
+        historyTableBody.innerHTML = '';
+        const sortedEntries = [...data.entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if(sortedEntries.length === 0) {
+            historyTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-500">${translations[currentLang].historyEmpty}</td></tr>`;
+            return;
+        }
+        
+        sortedEntries.forEach(entry => {
+            const row = document.createElement('tr');
+            const typeKey = { income: 'typeIncome', expense: 'typeExpense', deposit: 'typeDeposit' }[entry.type];
+            const typeText = translations[currentLang][typeKey];
+            const typeColor = { income: 'text-green-600', expense: 'text-red-600', deposit: 'text-blue-600' }[entry.type];
+            const account = data.accounts.find(a => a.id === entry.accountId);
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">${entry.date}</td>
+                <td class="px-6 py-4 whitespace-nowrap"><span class="font-semibold ${typeColor}">${typeText}</span></td>
+                <td class="px-6 py-4 whitespace-nowrap">¥${entry.amount.toLocaleString()}</td> <td class="px-6 py-4 whitespace-nowrap">${account ? account.name : 'N/A'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${entry.memo || ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button class="text-red-600 hover:text-red-900" data-id="${entry.id}">${translations[currentLang].historyDelete}</button>
+                </td>`;
+            historyTableBody.appendChild(row);
+        });
+    }
+            
+    function renderExchangeHistory() {
+        exchangeHistoryBody.innerHTML = '';
+        const sortedExchanges = [...data.exchanges].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if (sortedExchanges.length === 0) {
+            exchangeHistoryBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500">${translations[currentLang].exchangeHistoryEmpty}</td></tr>`;
+            return;
+        }
+        
+        sortedExchanges.forEach(ex => {
+        const rate = ex.jpy > 0 ? (ex.cny / ex.jpy).toFixed(4) : 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="px-4 py-4 whitespace-nowrap">${ex.date}</td>
+            <td class="px-4 py-4 whitespace-nowrap">¥ ${ex.jpy.toLocaleString()}</td>
+            <td class="px-4 py-4 whitespace-nowrap">¥ ${ex.cny.toLocaleString()}</td>
+            <td class="px-4 py-4 whitespace-nowrap font-semibold text-indigo-600">${rate}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button class="text-red-600 hover:text-red-900" data-id="${ex.id}">${translations[currentLang].historyDelete}</button>
+            </td>
+        `;
+        exchangeHistoryBody.appendChild(row);
+        });
+    }
+    
+    function renderChart() {
+        const ctx = document.getElementById('asset-chart').getContext('2d');
+        const allMonths = [...new Set(data.entries.map(e => e.date.substring(0, 7)))].sort();
+        
+        if (allMonths.length === 0) {
+            if(assetChart) assetChart.destroy();
+            return;
+        }
+        
+        const datasets = [
+            { label: translations[currentLang].chartIncome, data: allMonths.map(m => data.entries.filter(e=>e.type==='income'&&e.date.startsWith(m)).reduce((s,e)=>s+e.amount,0)), borderColor: 'rgba(16, 185, 129, 0.8)', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, },
+            { label: translations[currentLang].chartExpense, data: allMonths.map(m => data.entries.filter(e=>e.type==='expense'&&e.date.startsWith(m)).reduce((s,e)=>s+e.amount,0)), borderColor: 'rgba(239, 68, 68, 0.8)', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.3, }
+        ];
+        
+        data.accounts.forEach(account => {
+            let lastBalance = 0;
+            datasets.push({
+                label: `${account.name} ${translations[currentLang].chartBalance}`,
+                data: allMonths.map(month => {
+                    const depositsInMonth = data.entries.filter(e => e.type === 'deposit' && e.accountId === account.id && e.date.startsWith(month)).sort((a,b) => new Date(b.date) - new Date(a.date));
+                    if (depositsInMonth.length > 0) lastBalance = depositsInMonth[0].amount;
+                    return lastBalance;
+                }),
+                borderColor: account.color, backgroundColor: 'transparent', tension: 0.3,
+            });
+        });
+        
+        if (assetChart) assetChart.destroy();
+        
+        assetChart = new Chart(ctx, {
+            type: 'line', data: { labels: allMonths, datasets: datasets },
+            options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: (v) => '¥' + v.toLocaleString() } } },
+                plugins: { tooltip: { callbacks: { label: (c) => `${c.dataset.label||''}: ¥${c.parsed.y.toLocaleString()}` } } }
+            }
+        });
+    }
+    
+    function setupEventListeners() {
+        document.getElementById('lang-ja').addEventListener('click', () => switchLanguage('ja'));
+        document.getElementById('lang-zh').addEventListener('click', () => switchLanguage('zh'));
+        entryTypeSelect.addEventListener('change', () => {
+            accountSelectorWrapper.style.display = entryTypeSelect.value === 'income' ? 'none' : 'block';
+        });
+        entryForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            data.entries.push({
+                id: Date.now(), type: entryTypeSelect.value, date: dateInput.value,
+                amount: parseInt(amountInput.value),
+                memo: memoInput.value.trim(),
+                accountId: entryTypeSelect.value === 'income' ? null : parseInt(accountSelector.value)
+            });
+            saveData(); updateUI(); entryForm.reset(); setDefaultDate();
+        });
+        
+        historyTableBody.addEventListener('click', (e) => {
+            if (e.target.dataset.id) {
+                if (confirm(translations[currentLang].confirmDelete)) {
+                    data.entries = data.entries.filter(entry => entry.id !== parseInt(e.target.dataset.id));
+                    saveData(); updateUI();
+                }
+            }
+        });
+        
+        // Modals
+        document.getElementById('open-settings-modal').addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        document.getElementById('close-settings-modal').addEventListener('click', () => settingsModal.classList.add('hidden'));
+        document.getElementById('settings-form').addEventListener('submit', (e) => { e.preventDefault(); data.accounts.forEach(acc => { acc.name = document.getElementById(`account-name-${acc.id}`).value || `Bank ${acc.id}`; acc.color = document.getElementById(`account-color-${acc.id}`).value; }); saveData(); updateUI(); settingsModal.classList.add('hidden'); });
+        document.getElementById('open-interest-modal').addEventListener('click', () => interestModal.classList.remove('hidden'));
+        document.getElementById('close-interest-modal').addEventListener('click', () => interestModal.classList.add('hidden'));
+        document.getElementById('interest-form').addEventListener('submit', (e) => { e.preventDefault(); const start = parseFloat(document.getElementById('start-balance').value), end = parseFloat(document.getElementById('end-balance').value), netDeposit = parseFloat(document.getElementById('net-deposit').value), period = parseInt(document.getElementById('period').value); const interestEarned = end - start - netDeposit, avgPrincipal = start + (netDeposit / 2); const annualRate = (avgPrincipal > 0) ? (interestEarned / avgPrincipal) * (12 / period) : 0; document.getElementById('interest-rate-result').textContent = `${(annualRate * 100).toFixed(4)} %`; document.getElementById('interest-result').classList.remove('hidden'); });
+        
+        // Exchange Modal Listeners (New)
+        document.getElementById('open-exchange-modal').addEventListener('click', () => exchangeModal.classList.remove('hidden'));
+        document.getElementById('close-exchange-modal').addEventListener('click', () => exchangeModal.classList.add('hidden'));
+        
+        document.getElementById('exchange-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newExchange = {
+                id: Date.now(),
+                date: document.getElementById('exchange-date').value,
+                jpy: parseFloat(document.getElementById('exchange-jpy').value),
+                cny: parseFloat(document.getElementById('exchange-cny').value)
+            };
+            data.exchanges.push(newExchange);
+            saveData();
+            renderExchangeHistory();
+            e.target.reset();
+            setDefaultDate();
+        });
+        
+        exchangeHistoryBody.addEventListener('click', (e) => {
+            if (e.target.dataset.id) {
+                if (confirm(translations[currentLang].confirmDelete)) {
+                    data.exchanges = data.exchanges.filter(ex => ex.id !== parseInt(e.target.dataset.id));
+                    saveData();
+                    renderExchangeHistory();
+                }
+            }
+        });
+    }
+    
+    initialize();
+});
+</script>
+</body>
+</html>
+
