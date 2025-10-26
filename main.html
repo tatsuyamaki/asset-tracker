@@ -27,6 +27,15 @@
             color: white;
             border-color: #4f46e5;
         }
+        /* (修正) スピナー非表示 */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 antialiased">
@@ -49,14 +58,14 @@
             <p data-lang-key="privacyBody">入力されたすべてのデータは、お使いのブラウザのローカルストレージにのみ保存されます。サーバーに送信されたり、第三者と共有されることはありません。</p>
         </div>
 
-        <!-- Dashboard -->
+        <!-- Dashboard (修正: フォントサイズ調整) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Assets -->
             <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h3 id="total-assets-label" class="text-lg font-semibold text-gray-500" data-lang-key="totalAssets">総資産</h3>
-                <p id="total-assets" class="text-3xl font-bold text-gray-800 mt-2">
+                <p id="total-assets" class="text-2xl xl:text-3xl font-bold text-gray-800 mt-2">
                     <span id="total-assets-jpy">¥0</span>
-                    <span id="total-assets-cny-wrapper" class="text-xl font-semibold text-gray-600">
+                    <span id="total-assets-cny-wrapper" class="text-lg xl:text-xl font-semibold text-gray-600">
                         + <span id="total-assets-cny">¥0</span> (CNY)
                     </span>
                 </p>
@@ -64,9 +73,9 @@
             <!-- Total Income -->
             <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h3 id="total-income-label" class="text-lg font-semibold text-gray-500" data-lang-key="totalIncome">累計収入</h3>
-                <p id="total-income" class="text-3xl font-bold text-green-600 mt-2">
+                <p id="total-income" class="text-2xl xl:text-3xl font-bold text-green-600 mt-2">
                     <span id="total-income-jpy">¥0</span>
-                    <span id="total-income-cny-wrapper" class="text-xl font-semibold text-gray-600">
+                    <span id="total-income-cny-wrapper" class="text-lg xl:text-xl font-semibold text-gray-600">
                         + <span id="total-income-cny">¥0</span> (CNY)
                     </span>
                 </p>
@@ -74,9 +83,9 @@
             <!-- Total Expense -->
             <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h3 id="total-expense-label" class="text-lg font-semibold text-gray-500" data-lang-key="totalExpense">累計支出</h3>
-                <p id="total-expense" class="text-3xl font-bold text-red-600 mt-2">
+                <p id="total-expense" class="text-2xl xl:text-3xl font-bold text-red-600 mt-2">
                     <span id="total-expense-jpy">¥0</span>
-                    <span id="total-expense-cny-wrapper" class="text-xl font-semibold text-gray-600">
+                    <span id="total-expense-cny-wrapper" class="text-lg xl:text-xl font-semibold text-gray-600">
                         + <span id="total-expense-cny">¥0</span> (CNY)
                     </span>
                 </p>
@@ -84,9 +93,9 @@
             <!-- Net Worth -->
             <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h3 id="net-worth-label" class="text-lg font-semibold text-gray-500" data-lang-key="netWorth">純資産</h3>
-                <p id="net-worth" class="text-3xl font-bold text-blue-600 mt-2">
+                <p id="net-worth" class="text-2xl xl:text-3xl font-bold text-blue-600 mt-2">
                     <span id="net-worth-jpy">¥0</span>
-                    <span id="net-worth-cny-wrapper" class="text-xl font-semibold text-gray-600">
+                    <span id="net-worth-cny-wrapper" class="text-lg xl:text-xl font-semibold text-gray-600">
                         + <span id="net-worth-cny">¥0</span> (CNY)
                     </span>
                 </p>
@@ -117,7 +126,8 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="col-span-2">
                             <label for="amount" class="block text-sm font-medium text-gray-700" data-lang-key="amount">金額</label>
-                            <input type="number" step="0.01" id="amount" data-lang-placeholder-key="amountPlaceholder" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
+                            <!-- (修正) type="text" と inputmode="numeric" でカンマ区切りに対応 -->
+                            <input type="text" inputmode="numeric" id="amount" data-lang-placeholder-key="amountPlaceholder" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required>
                         </div>
                         <div>
                              <label for="currency" class="block text-sm font-medium text-gray-700" data-lang-key="currency">通貨</label>
@@ -133,6 +143,7 @@
                         <label for="memo" class="block text-sm font-medium text-gray-700" data-lang-key="memoLabel">メモ (任意)</label>
                         <textarea id="memo" rows="3" data-lang-placeholder-key="memoPlaceholder" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm"></textarea>
                     </div>
+                    <!-- (修正) 常に口座セレクタを表示 -->
                     <div id="account-selector-wrapper">
                         <label for="account-selector" class="block text-sm font-medium text-gray-700" data-lang-key="account">口座</label>
                         <select id="account-selector" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm"></select>
@@ -151,14 +162,31 @@
                 <div class="bg-white p-6 rounded-2xl shadow-md">
                     <h2 class="text-2xl font-bold mb-4" data-lang-key="assetChartTitle">資産推移グラフ</h2>
                    
-                    <!-- New Chart Rate Controller -->
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6 flex flex-col sm:flex-row gap-3 items-center">
+                    <!-- Chart Rate Controller -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-4 flex flex-col sm:flex-row gap-3 items-center">
                         <label for="chart-exchange-rate" class="block text-sm font-medium text-gray-700 whitespace-nowrap" data-lang-key="chartRateLabel">グラフ用レート:</label>
                         <input type="number" step="0.01" id="chart-exchange-rate" data-lang-placeholder-key="chartRatePlaceholder" class="block w-full sm:w-auto flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm">
                         <button id="apply-rate-button" class="w-full sm:w-auto bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition" data-lang-key="applyButton">適用</button>
                         <button id="clear-rate-button" class="w-full sm:w-auto bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition" data-lang-key="clearButton">クリア</button>
                     </div>
-                    <!-- End New Chart Rate Controller -->
+                   
+                    <!-- (新規) Chart Display Toggle -->
+                    <div id="chart-toggle-wrapper" class="bg-gray-50 p-4 rounded-lg mb-6 flex flex-wrap gap-x-6 gap-y-3 items-center justify-center">
+                        <span class="text-sm font-medium text-gray-700" data-lang-key="chartToggleLabel">グラフ表示切替:</span>
+                        <div class="flex items-center">
+                            <input id="toggle-deposits" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" checked>
+                            <label for="toggle-deposits" class="ml-2 block text-sm text-gray-900" data-lang-key="chartToggleDeposits">預金残高</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="toggle-income" type="checkbox" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+                            <label for="toggle-income" class="ml-2 block text-sm text-gray-900" data-lang-key="chartToggleIncome">収入</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="toggle-expense" type="checkbox" class="h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                            <label for="toggle-expense" class="ml-2 block text-sm text-gray-900" data-lang-key="chartToggleExpense">支出</label>
+                        </div>
+                    </div>
+                    <!-- End Chart Display Toggle -->
                    
                     <canvas id="asset-chart"></canvas>
                 </div>
@@ -185,14 +213,13 @@
     </div>
 
     <!-- Modals (Settings, Interest, Exchange) -->
-    <!-- (Modal HTML is unchanged, so redacted for brevity) -->
     <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden"><div class="absolute inset-0 modal-backdrop"></div><div class="bg-white rounded-2xl shadow-xl w-full max-w-md m-4 p-8 z-10"><h2 class="text-2xl font-bold mb-6" data-lang-key="settingsTitle">銀行口座の設定</h2><form id="settings-form" class="space-y-6"><div><label class="block text-sm font-medium text-gray-700" data-lang-key="account1">口座 1</label><div class="flex items-center space-x-2 mt-1"><input type="text" id="account-name-1" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm"><input type="color" id="account-color-1" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer"></div></div><div><label class="block text-sm font-medium text-gray-700" data-lang-key="account2">口座 2</label><div class="flex items-center space-x-2 mt-1"><input type="text" id="account-name-2" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm"><input type="color" id="account-color-2" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer"></div></div><div><label class="block text-sm font-medium text-gray-700" data-lang-key="account3">口座 3</label><div class="flex items-center space-x-2 mt-1"><input type="text" id="account-name-3" data-lang-placeholder-key="bankNamePlaceholder" class="flex-grow py-2 px-3 border border-gray-300 rounded-md shadow-sm"><input type="color" id="account-color-3" class="w-12 h-10 p-1 border border-gray-300 rounded-md cursor-pointer"></div></div><div class="flex justify-end space-x-4 pt-4"><button type="button" id="close-settings-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button><button type="submit" class="bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition" data-lang-key="saveButton">保存</button></div></form></div></div>
     <div id="interest-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden"><div class="absolute inset-0 modal-backdrop"></div><div class="bg-white rounded-2xl shadow-xl w-full max-w-md m-4 p-8 z-10"><h2 class="text-2xl font-bold mb-6" data-lang-key="interestTitle">利率計算ツール (年利)</h2><form id="interest-form" class="space-y-4"><div><label for="start-balance" class="block text-sm font-medium text-gray-700" data-lang-key="startBalance">期間開始時の残高</label><input type="number" id="start-balance" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required></div><div><label for="end-balance" class="block text-sm font-medium text-gray-700" data-lang-key="endBalance">期間終了時の残高</label><input type="number" id="end-balance" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required></div><div><label for="net-deposit" class="block text-sm font-medium text-gray-700" data-lang-key="netDeposit">期間中の入金額 (利子を除く)</label><input type="number" id="net-deposit" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required></div><div><label for="period" class="block text-sm font-medium text-gray-700" data-lang-key="periodMonths">期間(ヶ月)</label><input type="number" id="period" value="12" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" required></div><button type="submit" class="w-full bg-teal-600 text-white font-bold py-3 rounded-lg hover:bg-teal-700 transition" data-lang-key="calculateButton">計算</button></form><div id="interest-result" class="mt-6 text-center bg-gray-100 p-4 rounded-lg hidden"><p class="text-lg font-semibold" data-lang-key="interestResultTitle">計算された年利:</p><p id="interest-rate-result" class="text-3xl font-bold text-teal-700"></p></div><div class="text-right mt-6"><button type="button" id="close-interest-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button></div></div></div>
     <div id="exchange-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden"><div class="absolute inset-0 modal-backdrop"></div><div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl m-4 p-8 z-10"><h2 class="text-2xl font-bold mb-6" data-lang-key="exchangeTitle">為替レート記録 (JPY ⇄ CNY)</h2><form id="exchange-form" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end mb-6"><div><label for="exchange-date" class="block text-sm font-medium text-gray-700" data-lang-key="date">日付</label><input type="date" id="exchange-date" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required></div><div><label for="exchange-jpy" class="block text-sm font-medium text-gray-700" data-lang-key="jpyAmount">支払った日本円 (JPY)</label><input type="number" id="exchange-jpy" placeholder="10000" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required></div><div><label for="exchange-cny" class="block text-sm font-medium text-gray-700" data-lang-key="cnyAmount">受け取った中国元 (CNY)</label><input type="number" id="exchange-cny" placeholder="500" step="0.01" class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm" required></div><div class="md:col-span-3"><button type="submit" class="w-full bg-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-700 transition" data-lang-key="recordButton">記録する</button></div></form><h3 class="text-xl font-bold mb-4" data-lang-key="historyTitle">履歴</h3><div class="max-h-64 overflow-y-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50 sticky top-0"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="historyDate">日付</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="jpyAmount">日本円 (JPY)</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="cnyAmount">中国元 (CNY)</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" data-lang-key="exchangeRate">レート (1 JPY)</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase" data-lang-key="historyAction">操作</th></tr></thead><tbody id="exchange-history-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><div class="text-right mt-6"><button type="button" id="close-exchange-modal" class="bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition" data-lang-key="closeButton">閉じる</button></div></div></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Translation Dictionary ---
+    // --- Translation Dictionary (修正) ---
     const translations = {
         ja: {
             appTitle: "資産管理アプリ", appSubtitle: "あなたのお金の流れをシンプルに可視化します。", privacyTitle: "プライバシーについて", privacyBody: "入力されたすべてのデータは、お使いのブラウザのローカルストレージにのみ保存されます。サーバーに送信されたり、第三者と共有されることはありません。",
@@ -200,11 +227,12 @@ document.addEventListener('DOMContentLoaded', () => {
             totalAssetsConverted: "総資産 (JPY換算)", totalIncomeConverted: "累計収入 (JPY換算)", totalExpenseConverted: "累計支出 (JPY換算)", netWorthConverted: "純資産 (JPY換算)",
             dataEntry: "データ入力", entryType: "種類", typeIncome: "収入", typeExpense: "支出", typeDeposit: "預金残高",
             date: "日付", dateHelp: "カレンダーアイコンから過去の日付も選択できます。",
-            amount: "金額", amountPlaceholder: "例: 300000", currency: "通貨",
+            amount: "金額", amountPlaceholder: "例: 300,000", currency: "通貨",
             memoLabel: "メモ (任意)", memoPlaceholder: "例: 中国渡航のため", account: "口座",
             recordButton: "記録する", settingsButton: "銀行口座の設定", interestButton: "利率計算ツール", exchangeButton: "為替レート記録",
             assetChartTitle: "資産推移グラフ",
             chartRateLabel: "グラフ用レート:", chartRatePlaceholder: "1 CNY = ? JPY", applyButton: "適用", clearButton: "クリア",
+            chartToggleLabel: "グラフ表示切替:", chartToggleDeposits: "預金残高", chartToggleIncome: "収入", chartToggleExpense: "支出", // 新規
             historyTitle: "全履歴",
             historyDate: "日付", historyType: "種類", historyAmount: "金額", historyAccount: "口座", historyMemo: "メモ", historyAction: "操作",
             historyEmpty: "履歴がありません。", historyDelete: "削除",
@@ -220,11 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
             totalAssetsConverted: "总资产 (折合JPY)", totalIncomeConverted: "累计收入 (折合JPY)", totalExpenseConverted: "累计支出 (折合JPY)", netWorthConverted: "净资产 (折合JPY)",
             dataEntry: "数据录入", entryType: "类型", typeIncome: "收入", typeExpense: "支出", typeDeposit: "存款余额",
             date: "日期", dateHelp: "您可以从日历图标中选择过去的日期。",
-            amount: "金额", amountPlaceholder: "例如: 300000", currency: "货币",
+            amount: "金额", amountPlaceholder: "例如: 300,000", currency: "货币",
             memoLabel: "备注 (可选)", memoPlaceholder: "例如: 为去中国出差", account: "账户",
             recordButton: "记录", settingsButton: "银行账户设置", interestButton: "利率计算器", exchangeButton: "汇率记录",
             assetChartTitle: "资产趋势图",
             chartRateLabel: "图表汇率:", chartRatePlaceholder: "1 CNY = ? JPY", applyButton: "应用", clearButton: "清除",
+            chartToggleLabel: "图表显示切换:", chartToggleDeposits: "存款余额", chartToggleIncome: "收入", chartToggleExpense: "支出", // 新規
             historyTitle: "全部历史记录",
             historyDate: "日期", historyType: "类型", historyAmount: "金额", historyAccount: "账户", historyMemo: "备注", historyAction: "操作",
             historyEmpty: "暂无历史记录。", historyDelete: "删除",
@@ -246,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-lang-key]').forEach(el => {
             const key = el.getAttribute('data-lang-key');
             if (translations[lang][key]) {
-                // Store original key to reset dashboard labels
                 if (!el.dataset.originalLangKey) {
                     el.dataset.originalLangKey = key;
                 }
@@ -262,8 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('lang-ja').classList.toggle('lang-btn-active', lang === 'ja');
         document.getElementById('lang-zh').classList.toggle('lang-btn-active', lang === 'zh');
        
-        // Re-render UI with current rate
-        const currentRate = parseFloat(document.getElementById('chart-exchange-rate').value) || 0;
+        // (修正) renderChart を直接呼ぶのではなく、renderUIを呼ぶ
+        const currentRate = parseFloat(chartRateInput.value) || 0;
         updateUI(currentRate);
     };
 
@@ -285,12 +313,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyRateButton = document.getElementById('apply-rate-button');
     const clearRateButton = document.getElementById('clear-rate-button');
 
+    // (新規) Chart Toggle Elements
+    const chartToggleWrapper = document.getElementById('chart-toggle-wrapper');
+    const toggleDeposits = document.getElementById('toggle-deposits');
+    const toggleIncome = document.getElementById('toggle-income');
+    const toggleExpense = document.getElementById('toggle-expense');
+
     // Dashboard Elements
     const totalAssetsEl = { label: document.getElementById('total-assets-label'), jpy: document.getElementById('total-assets-jpy'), cny: document.getElementById('total-assets-cny'), wrapper: document.getElementById('total-assets-cny-wrapper') };
     const totalIncomeEl = { label: document.getElementById('total-income-label'), jpy: document.getElementById('total-income-jpy'), cny: document.getElementById('total-income-cny'), wrapper: document.getElementById('total-income-cny-wrapper') };
     const totalExpenseEl = { label: document.getElementById('total-expense-label'), jpy: document.getElementById('total-expense-jpy'), cny: document.getElementById('total-expense-cny'), wrapper: document.getElementById('total-expense-cny-wrapper') };
     const netWorthEl = { label: document.getElementById('net-worth-label'), jpy: document.getElementById('net-worth-jpy'), cny: document.getElementById('net-worth-cny'), wrapper: document.getElementById('net-worth-cny-wrapper') };
-    const dashboardEls = [totalAssetsEl, totalIncomeEl, totalExpenseEl, netWorthEl];
 
     let assetChart;
 
@@ -304,10 +337,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const savedLang = localStorage.getItem('assetTrackerLang') || 'ja';
         const savedRate = localStorage.getItem('assetTrackerChartRate') || '';
         chartRateInput.value = savedRate;
+       
+        // (新規) Load saved chart toggles
+        toggleDeposits.checked = localStorage.getItem('toggleDeposits') !== 'false'; // Default true
+        toggleIncome.checked = localStorage.getItem('toggleIncome') === 'true'; // Default false
+        toggleExpense.checked = localStorage.getItem('toggleExpense') === 'true'; // Default false
+
         loadData();
         setupEventListeners();
         setDefaultDate();
-        switchLanguage(savedLang); // This will call updateUI with the saved rate
+        switchLanguage(savedLang); // This will call updateUI
     }
 
     function loadData() {
@@ -315,13 +354,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedData) {
             const parsedData = JSON.parse(savedData);
             data.accounts = parsedData.accounts || data.accounts;
-            // Backward compatibility
             data.entries = (parsedData.entries || []).map(entry => {
-                if (!entry.currency) {
-                    // Very old format (before currency)
-                    entry.currency = 'JPY';
-                }
-                // Discard rate/amountJPY from previous version if they exist
+                if (!entry.currency) entry.currency = 'JPY';
                 return {
                     id: entry.id, type: entry.type, date: entry.date,
                     amount: entry.amount, currency: entry.currency,
@@ -349,7 +383,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAccountSelectors();
         updateDashboard(chartRate);
         renderHistory();
-        renderChart(chartRate);
+        // (修正) Pass toggle state to renderChart
+        renderChart(chartRate, {
+            deposits: toggleDeposits.checked,
+            income: toggleIncome.checked,
+            expense: toggleExpense.checked
+        });
         renderExchangeHistory();
     }
    
@@ -368,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Helper to get converted amount
     function getConvertedAmount(amount, currency, rate) {
         if (currency === 'CNY' && rate > 0) {
             return amount * rate;
@@ -376,32 +414,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currency === 'JPY') {
             return amount;
         }
-        return 0; // Don't count CNY if rate is 0
+        return 0;
     }
 
     function updateDashboard(chartRate) {
         let totalIncome = { jpy: 0, cny: 0 };
         let totalExpense = { jpy: 0, cny: 0 };
-        let latestDeposits = {}; // { 1: {jpy: 0, cny: 0}, 2: ... }
+        let latestDeposits = {};
+        data.accounts.forEach(acc => { latestDeposits[acc.id] = { jpy: 0, cny: 0 }; });
 
-        data.accounts.forEach(acc => {
-            latestDeposits[acc.id] = { jpy: 0, cny: 0 };
-        });
-
-        data.entries
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
-            .forEach(entry => {
-                const currencyKey = entry.currency.toLowerCase();
-                if (entry.type === 'income') {
-                    totalIncome[currencyKey] += entry.amount;
-                } else if (entry.type === 'expense') {
-                    totalExpense[currencyKey] += entry.amount;
-                } else if (entry.type === 'deposit') {
-                    if (latestDeposits[entry.accountId]) {
-                        latestDeposits[entry.accountId][currencyKey] = entry.amount;
-                    }
+        // (修正) 預金残高の計算ロジックを修正
+        // 日付順にソートして、最新の残高を追跡
+        const sortedEntries = [...data.entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+       
+        sortedEntries.forEach(entry => {
+            const currencyKey = entry.currency.toLowerCase();
+            if (entry.type === 'income') {
+                totalIncome[currencyKey] += entry.amount;
+            } else if (entry.type === 'expense') {
+                totalExpense[currencyKey] += entry.amount;
+            } else if (entry.type === 'deposit') {
+                if (latestDeposits[entry.accountId]) {
+                    // (修正) 口座の通貨ごとに最新の残高を保持する
+                    if(entry.currency === 'JPY') latestDeposits[entry.accountId].jpy = entry.amount;
+                    if(entry.currency === 'CNY') latestDeposits[entry.accountId].cny = entry.amount;
                 }
-            });
+            }
+        });
 
         let totalAssets = { jpy: 0, cny: 0 };
         data.accounts.forEach(acc => {
@@ -423,13 +462,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dashboardData.forEach(item => {
             if (chartRate > 0) {
-                // Converted View
                 const totalJPY = item.data.jpy + (item.data.cny * chartRate);
                 item.el.jpy.textContent = `¥${totalJPY.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
                 item.el.wrapper.style.display = 'none';
                 item.el.label.textContent = translations[currentLang][`${item.key}Converted`];
             } else {
-                // Dual Currency View
                 item.el.jpy.textContent = `¥${item.data.jpy.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
                 item.el.cny.textContent = `¥${item.data.cny.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
                 item.el.wrapper.style.display = item.data.cny === 0 ? 'none' : 'inline';
@@ -452,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const typeKey = { income: 'typeIncome', expense: 'typeExpense', deposit: 'typeDeposit' }[entry.type];
             const typeText = translations[currentLang][typeKey];
             const typeColor = { income: 'text-green-600', expense: 'text-red-600', deposit: 'text-blue-600' }[entry.type];
+            // (修正) 収入でも口座名を表示
             const account = data.accounts.find(a => a.id === entry.accountId);
             const amountText = entry.currency === 'CNY'
                 ? `¥ ${entry.amount.toLocaleString()} (CNY)`
@@ -461,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-4 whitespace-nowrap">${entry.date}</td>
                 <td class="px-6 py-4 whitespace-nowrap"><span class="font-semibold ${typeColor}">${typeText}</span></td>
                 <td class="px-6 py-4 whitespace-nowrap font-semibold">${amountText}</td>
+                <!-- (修正) 収入でも口座名を表示。見つからない場合は N/A -->
                 <td class="px-6 py-4 whitespace-nowrap">${account ? account.name : 'N/A'}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${entry.memo || ''}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -473,12 +512,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderExchangeHistory() {
         exchangeHistoryBody.innerHTML = '';
         const sortedExchanges = [...data.exchanges].sort((a, b) => new Date(b.date) - new Date(a.date));
-
         if (sortedExchanges.length === 0) {
             exchangeHistoryBody.innerHTML = `<tr><td colspan="5" class="text-center py-10 text-gray-500">${translations[currentLang].exchangeHistoryEmpty}</td></tr>`;
             return;
         }
-
         sortedExchanges.forEach(ex => {
             const rate = ex.jpy > 0 ? (ex.cny / ex.jpy).toFixed(4) : 0;
             const row = document.createElement('tr');
@@ -495,7 +532,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderChart(chartRate) {
+    // (修正) グラフ切り替え機能を追加
+    function renderChart(chartRate, toggles) {
         const ctx = document.getElementById('asset-chart').getContext('2d');
         const allMonths = [...new Set(data.entries.map(e => e.date.substring(0, 7)))].sort();
 
@@ -504,41 +542,54 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
        
-        // Helper function for chart data aggregation
-        const getAggregatedData = (type) => {
-            return allMonths.map(m =>
+        const datasets = [];
+
+        // 収入グラフ
+        if (toggles.income) {
+            const incomeData = allMonths.map(m =>
                 data.entries
-                    .filter(e => e.type === type && e.date.startsWith(m))
+                    .filter(e => e.type === 'income' && e.date.startsWith(m))
                     .reduce((s, e) => s + getConvertedAmount(e.amount, e.currency, chartRate), 0)
             );
-        };
-       
-        const datasets = [
-            { label: translations[currentLang].chartIncome, data: getAggregatedData('income'), borderColor: 'rgba(16, 185, 129, 0.8)', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, },
-            { label: translations[currentLang].chartExpense, data: getAggregatedData('expense'), borderColor: 'rgba(239, 68, 68, 0.8)', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.3, }
-        ];
+            datasets.push({ label: translations[currentLang].chartIncome, data: incomeData, borderColor: 'rgba(16, 185, 129, 0.8)', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3, });
+        }
 
-        data.accounts.forEach(account => {
-            let lastBalances = { jpy: 0, cny: 0 };
-            datasets.push({
-                label: `${account.name} ${translations[currentLang].chartBalance}`,
-                data: allMonths.map(month => {
-                    const depositsInMonth = data.entries
-                        .filter(e => e.type === 'deposit' && e.accountId === account.id && e.date.startsWith(month))
-                        .sort((a,b) => new Date(b.date) - new Date(a.date));
+        // 支出グラフ
+        if (toggles.expense) {
+            const expenseData = allMonths.map(m =>
+                data.entries
+                    .filter(e => e.type === 'expense' && e.date.startsWith(m))
+                    .reduce((s, e) => s + getConvertedAmount(e.amount, e.currency, chartRate), 0)
+            );
+            datasets.push({ label: translations[currentLang].chartExpense, data: expenseData, borderColor: 'rgba(239, 68, 68, 0.8)', backgroundColor: 'rgba(239, 68, 68, 0.1)', fill: true, tension: 0.3, });
+        }
+
+        // 預金残高グラフ
+        if (toggles.deposits) {
+            data.accounts.forEach(account => {
+                let lastBalances = { jpy: 0, cny: 0 }; // 口座ごとにリセット
+                const depositData = allMonths.map(month => {
+                    // (修正) その月までのすべてのデータを考慮する
+                    const entriesUpToMonth = data.entries
+                        .filter(e => e.type === 'deposit' && e.accountId === account.id && e.date.substring(0, 7) <= month)
+                        .sort((a,b) => new Date(b.date) - new Date(a.date)); // 日付の降順ソート
+
+                    const latestJPY = entriesUpToMonth.find(d => d.currency === 'JPY');
+                    const latestCNY = entriesUpToMonth.find(d => d.currency === 'CNY');
                    
-                    if (depositsInMonth.length > 0) {
-                        // Find latest deposit for each currency within the month
-                        const latestJPY = depositsInMonth.find(d => d.currency === 'JPY');
-                        const latestCNY = depositsInMonth.find(d => d.currency === 'CNY');
-                        if (latestJPY) lastBalances.jpy = latestJPY.amount;
-                        if (latestCNY) lastBalances.cny = latestCNY.amount;
-                    }
+                    // 月をまたいで最新の残高を維持
+                    if (latestJPY) lastBalances.jpy = latestJPY.amount;
+                    if (latestCNY) lastBalances.cny = latestCNY.amount;
+
                     return getConvertedAmount(lastBalances.jpy, 'JPY', chartRate) + getConvertedAmount(lastBalances.cny, 'CNY', chartRate);
-                }),
-                borderColor: account.color, backgroundColor: 'transparent', tension: 0.3,
+                });
+                datasets.push({
+                    label: `${account.name} ${translations[currentLang].chartBalance}`,
+                    data: depositData,
+                    borderColor: account.color, backgroundColor: 'transparent', tension: 0.3,
+                });
             });
-        });
+        }
 
         if (assetChart) assetChart.destroy();
        
@@ -550,24 +601,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // (新規) カンマ区切りフォーマッター
+    function formatAmountInput(e) {
+        let value = e.target.value;
+        // 小数点と数字以外（カンマなど）を除去
+        let numericValue = value.replace(/[^0-9.]/g, '');
+       
+        const parts = numericValue.split('.');
+        let integerPart = parts[0];
+        let decimalPart = parts[1];
+
+        // 整数部分をカンマ区切りに
+        integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+        // 小数点がある場合は、それを維持 (小数点以下2桁まで)
+        if (decimalPart !== undefined) {
+            e.target.value = `${integerPart}.${decimalPart.slice(0, 2)}`;
+        } else {
+            e.target.value = integerPart;
+        }
+    }
+
     function setupEventListeners() {
         document.getElementById('lang-ja').addEventListener('click', () => switchLanguage('ja'));
         document.getElementById('lang-zh').addEventListener('click', () => switchLanguage('zh'));
 
-        entryTypeSelect.addEventListener('change', () => {
-            accountSelectorWrapper.style.display = entryTypeSelect.value === 'income' ? 'none' : 'block';
-        });
+        // (修正) 収入の場合でも口座セレクタを隠すロジックを削除
+        // entryTypeSelect.addEventListener('change', () => { ... });
+
+        // (新規) 金額入力にカンマ区切りリスナーを追加
+        amountInput.addEventListener('input', formatAmountInput);
 
         entryForm.addEventListener('submit', (e) => {
             e.preventDefault();
+           
+            // (修正) カンマを除去してから数値に変換
+            const amountString = amountInput.value.replace(/,/g, '');
+           
             data.entries.push({
                 id: Date.now(),
                 type: entryTypeSelect.value,
                 date: dateInput.value,
-                amount: parseFloat(amountInput.value),
+                amount: parseFloat(amountString) || 0, // カンマ除去後の値を使用
                 currency: currencySelect.value,
                 memo: memoInput.value.trim(),
-                accountId: entryTypeSelect.value === 'income' ? null : parseInt(accountSelector.value)
+                accountId: parseInt(accountSelector.value) // (修正) 常に口座IDを取得
             });
             saveData();
             const currentRate = parseFloat(chartRateInput.value) || 0;
@@ -585,6 +663,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateUI(currentRate);
                 }
             }
+        });
+
+        // (新規) Chart Toggle Listeners
+        const chartToggles = [toggleDeposits, toggleIncome, toggleExpense];
+        chartToggles.forEach(toggle => {
+            toggle.addEventListener('change', () => {
+                // Save state
+                localStorage.setItem(toggle.id, toggle.checked);
+                // Re-render chart
+                const currentRate = parseFloat(chartRateInput.value) || 0;
+                updateUI(currentRate);
+            });
         });
 
         // Chart Rate Listeners

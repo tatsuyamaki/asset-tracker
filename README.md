@@ -55,10 +55,10 @@ This is a powerful personal asset tracking application that runs entirely in you
 ![日语版首页](images/Screenshot.png)
 ---
 ## 更新履歴 (Change Log)
-2025-10-25 (v1.1.0)
+2025-10-27 (v2.1)
 - 入力と表示の多通貨対応：支持多货币输入与显示,数据录入时，可选择货币(JPY/CNY)
 - 動的為替レート機能：动态汇率功能
-- 利率計算ツールのUI改善：改进了利率计算器的用户界面
+- UI改善：改进了用户界面
 
 2025-10-22 (v1.0.0)
 - プロジェクトの初期リリース：项目初始版本发布
