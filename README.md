@@ -58,7 +58,7 @@ This is a powerful personal asset tracking application that runs entirely in you
 2025-10-27 (v2.1)
 - 入力と表示の多通貨対応：支持多货币输入与显示,数据录入时，可选择货币(JPY/CNY)
 - 動的為替レート機能：动态汇率功能
-- UI改善：改进了用户界面
+- UI改善：进行了UI改善
 
 2025-10-22 (v1.0.0)
 - プロジェクトの初期リリース：项目初始版本发布
